@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منيو الفخامة والتميز</title>
+    <style>
+        :root {
+            --bg-dark: #0b0b0b;
+            --gold-accent: #d4af37;
+            --gold-hover: #f3e5ab;
+            --card-bg: #141414;
+            --text-light: #ffffff;
+            --text-muted: #a6a6a6;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Times New Roman', 'Segoe UI', serif; }
+        body { background-color: var(--bg-dark); color: var(--text-light); padding: 25px 15px; }
+        
+        header { text-align: center; margin-bottom: 40px; padding: 30px 10px; border: 1px solid var(--gold-accent); border-radius: 4px; background: linear-gradient(135deg, #141414 0%, #050505 100%); position: relative; }
+        header::after { content: ''; display: block; width: 60px; height: 2px; background-color: var(--gold-accent); margin: 15px auto 0 auto; }
+        header h1 { font-size: 2.5rem; color: var(--gold-accent); font-weight: normal; letter-spacing: 2px; }
+        header p { color: var(--text-muted); font-size: 1rem; font-style: italic; margin-top: 5px; }
+        
+        .category-nav { display: flex; justify-content: center; gap: 12px; margin-bottom: 35px; overflow-x: auto; padding: 10px 0; }
+        .category-btn { background-color: transparent; color: var(--text-light); padding: 12px 24px; border-radius: 0; font-size: 1rem; border: 1px solid #333; cursor: pointer; transition: all 0.4s ease; white-space: nowrap; letter-spacing: 1px; }
+        .category-btn.active { background-color: var(--gold-accent); color: var(--bg-dark); border-color: var(--gold-accent); font-weight: bold; }
+        .category-btn:hover:not(.active) { border-color: var(--gold-accent); color: var(--gold-accent); }
+
+        .menu-items { display: grid; gap: 25px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+        .item-card { background-color: var(--card-bg); border-radius: 0; overflow: hidden; border: 1px solid #222; transition: all 0.3s ease; display: none; padding: 20px; position: relative; }
+        .item-card.show { display: block; }
+        .item-card:hover { border-color: var(--gold-accent); transform: translateY(-3px); }
+        
+        .item-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; border-bottom: 1px dashed #333; padding-bottom: 8px; }
+        .item-title { font-size: 1.4rem; font-weight: normal; color: var(--gold-accent); }
+        .item-price { color: var(--text-light); font-size: 1.3rem; font-weight: bold; }
+        .item-desc { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 15px; font-style: italic; }
+        
+        .order-btn { background-color: transparent; color: var(--gold-accent); border: 1px solid var(--gold-accent); padding: 10px; cursor: pointer; font-size: 0.95rem; width: 100%; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; }
+        .order-btn:hover { background-color: var(--gold-accent); color: var(--bg-dark); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>مطعم لافيستـا الملكي</h1>
+        <p>تجربة طهي استثنائية تأخذك لعالم الضيافة الفاخرة</p>
+    </header>
+
+    <div class="category-nav">
+        <span class="category-btn active" onclick="filterCategory('appetizers')">المقبلات الفاخرة</span>
+        <span class="category-btn" onclick="filterCategory('main-course')">الأطباق الرئيسية</span>
+        <span class="category-btn" onclick="filterCategory('desserts')">الحلويات والمشروبات</span>
+    </div>
+
+    <div class="menu-items">
+        
+        <div class="item-card appetizers show">
+            <div class="item-header">
+                <div class="item-title">شوربة الفطر البري والترافل</div>
+                <div class="item-price">12,000 د.ع</div>
+            </div>
+            <p class="item-desc">مزيج غني من الفطر البري الطازج مع كريمة الترافل السوداء الفاخرة والأعشاب العطرية.</p>
+            <button class="order-btn">إضافة للطلب</button>
+        </div>
+
+        <div class="item-card appetizers show">
+            <div class="item-header">
+                <div class="item-title">سلطة الماعز المقرمشة</div>
+                <div class="item-price">14,000 د.ع</div>
+            </div>
+            <p class="item-desc">أوراق الجرجير الطازجة مع جبن الماعز الفرنسي المقرمش، الجوز المكرمل، وصلصة الخردل بالعسل.</p>
+            <button class="order-btn">إضافة للطلب</button>
+        </div>
+
+        <div class="item-card main-course">
+            <div class="item-header">
+                <div class="item-title">ستيك فيليه مينيون ملكي</div>
+                <div class="item-price">45,000 د.ع</div>
+            </div>
+            <p class="item-desc">قطعة فاخرة من لحم البقر الأنجوس المشوي على اللهب، تُقدم مع بطاطا بيوريه ناعمة وصلصة الفلفل الأسود الغنية.</p>
+            <button class="order-btn">إضافة للطلب</button>
+        </div>
+
+        <div class="item-card main-course">
+            <div class="item-header">
+                <div class="item-title">السلمون الاسكتلندي المشوي</div>
+                <div class="item-price">38,000 د.ع</div>
+            </div>
+            <p class="item-desc">فيليه السلمون الطازج بصلصة الليمون والزبدة الفاخرة، يُقدم مع الهليون المشوي والأرز البري الهايدي.</p>
+            <button class="order-btn">إضافة للطلب</button>
+        </div>
+
+        <div class="item-card desserts">
+            <div class="item-header">
+                <div class="item-title">فوندان الشوكولاتة الداكنة</div>
+                <div class="item-price">15,000 د.ع</div>
+            </div>
+            <p class="item-desc">كيك الشوكولاتة البلجيكية الساخنة بقلب ذائب غني، يُقدم مع بولا من آيس كريم الفانيليا الطبيعية.</p>
+            <button class="order-btn">إضافة للطلب</button>
+        </div>
+
+    </div>
+
+    <script>
+        function filterCategory(category) {
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const cards = document.querySelectorAll('.item-card');
+            cards.forEach(card => {
+                if (card.classList.contains(category)) {
+                    card.classList.add('show');
+                } else {
+                    card.classList.remove('show');
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
