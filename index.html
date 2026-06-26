@@ -24,7 +24,6 @@
         .restaurant-name { font-size: 26px; font-weight: bold; color: var(--text-light); }
         .restaurant-info { font-size: 13px; color: var(--text-muted); margin-top: 5px; }
 
-        /* شريط الأقسام الثابت */
         .categories-nav { display: flex; gap: 10px; overflow-x: auto; padding: 15px 20px; position: sticky; top: 0; background: #070707; z-index: 100; border-bottom: 1px solid #222; scrollbar-width: none; }
         .categories-nav::-webkit-scrollbar { display: none; }
         .category-btn { background: var(--card-bg); color: var(--text-light); border: 1px solid #333; padding: 10px 20px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-size: 14px; font-weight: bold; -webkit-tap-highlight-color: transparent; }
@@ -50,7 +49,6 @@
         .q-btn { background: none; border: none; color: var(--gold); font-size: 18px; font-weight: bold; cursor: pointer; width: 24px; }
         .q-num { font-size: 14px; font-weight: bold; min-width: 15px; text-align: center; }
 
-        /* أزرار تحكم الكابتن داخل الصنف */
         .captain-actions { display: flex; gap: 8px; border-top: 1px solid #222; padding-top: 8px; width: 100%; }
         .btn-captain-edit { background: var(--info); color: white; border: none; padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .btn-captain-del { background: var(--danger); color: white; border: none; padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
@@ -58,7 +56,6 @@
         .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #121212; border-top: 2px solid var(--gold); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; max-width: 600px; margin: 0 auto; z-index: 99; }
         .btn-order { background: var(--success); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
 
-        /* ستايل النوافذ المنبثقة ولوحة التحكم */
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
         .modal-content { background: var(--card-bg); border: 1px solid var(--gold); border-radius: 15px; padding: 25px; width: 100%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto; }
         .input-table, .captain-input, .captain-select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; text-align: center; font-size: 16px; margin: 10px 0; font-weight: bold; outline: none; }
@@ -66,7 +63,6 @@
         .btn-confirm { background: var(--gold); color: #000; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; }
         .close-modal { color: var(--text-muted); font-size: 13px; cursor: pointer; margin-top: 15px; display: inline-block; }
 
-        /* زر إدارة المنيو في الأسفل */
         .admin-trigger { text-align: center; margin: 20px 0; }
         .admin-link { color: var(--gold-light); font-size: 13px; text-decoration: underline; cursor: pointer; }
     </style>
@@ -87,27 +83,22 @@
         </div>
 
         <div class="menu-container">
-            
             <div id="hareesa" class="menu-section active-section">
                 <h2 class="section-title">قسم الهريسة الفاخرة</h2>
                 <div id="hareesa-items"></div>
             </div>
-
             <div id="drinks" class="menu-section">
                 <h2 class="section-title">مشروبات غازية باردة</h2>
                 <div id="drinks-items"></div>
             </div>
-
             <div id="sweets" class="menu-section">
                 <h2 class="section-title">قسم الحلويات والتحلية</h2>
                 <div id="sweets-items"></div>
             </div>
-
             <div id="appetizers" class="menu-section">
                 <h2 class="section-title">قسم المقبلات والشوربات</h2>
                 <div id="appetizers-items"></div>
             </div>
-
         </div>
 
         <div class="admin-trigger">
@@ -123,6 +114,7 @@
         </div>
     </div>
 
+    <!-- نافذة تأكيد الطلب للزبون -->
     <div id="checkout-modal" class="modal">
         <div class="modal-content">
             <h3>تأكيد الطلب 🧾</h3>
@@ -133,6 +125,7 @@
         </div>
     </div>
 
+    <!-- نافذة لوحة تحكم الكابتن -->
     <div id="captain-modal" class="modal">
         <div class="modal-content">
             <h3 style="color: var(--gold-light); margin-bottom: 10px;">إدارة قوائم الطعام ⚙️</h3>
@@ -199,13 +192,20 @@
             ]
         };
 
-        // تصفير وتنظيف إجباري وشامل للذاكرة القديمة التالفة لمنع الاختفاء تماماً
+        // فحص ذكي وآمن: نقرأ القديم إذا وجد، وإن لم يوجد نعتمد الافتراضي دون تصفير تلقائي ومستمر
         let menuData;
         try {
-            // نقوم بمسح الذاكرة القديمة نهائياً وبنائها من جديد لضمان الاستقرار الفوري
-            localStorage.removeItem('hlem_bismayah_menu');
-            menuData = defaultMenuData;
-            localStorage.setItem('hlem_bismayah_menu', JSON.stringify(defaultMenuData));
+            let localData = localStorage.getItem('hlem_bismayah_menu');
+            if (localData && localData.trim() !== "" && localData !== "undefined") {
+                menuData = JSON.parse(localData);
+                if (!menuData.hareesa || !menuData.drinks || !menuData.sweets || !menuData.appetizers) {
+                    menuData = defaultMenuData;
+                    localStorage.setItem('hlem_bismayah_menu', JSON.stringify(defaultMenuData));
+                }
+            } else {
+                menuData = defaultMenuData;
+                localStorage.setItem('hlem_bismayah_menu', JSON.stringify(defaultMenuData));
+            }
         } catch(e) {
             menuData = defaultMenuData;
         }
@@ -258,12 +258,8 @@
             document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
             
             const selectedSection = document.getElementById(sectionId);
-            if (selectedSection) {
-                selectedSection.classList.add('active-section');
-            }
-            if (element) {
-                element.classList.add('active');
-            }
+            if (selectedSection) selectedSection.classList.add('active-section');
+            if (element) element.classList.add('active');
             window.scrollTo({ top: 0, behavior: 'instant' });
         }
 
@@ -290,7 +286,7 @@
                 let checkPass = prompt("يرجى إدخال رمز دخول الكابتن الافتراضي:");
                 if (checkPass === CAPTAIN_PASSWORD) {
                     isCaptainMode = true;
-                    alert("تم تفعيل وضع الكابتن بنجاح! تظهر لك الآن أزرار التعديل والحذف أسفل المنتجات.");
+                    alert("تم تفعيل وضع الكابتن بنجاح!");
                     renderMenu();
                 } else {
                     alert("الرمز خاطئ!");
@@ -374,7 +370,7 @@
             let total = 0;
             for (let id in cart) {
                 if(allItemsFlattened[id]) {
-                    itemsDetails.push(`• ${allItemsFlattened[id].name} (عدد ${cart[id]})`);
+              itemsDetails.push(`• ${allItemsFlattened[id].name} (عدد ${cart[id]})`);
                     total += cart[id] * allItemsFlattened[id].price;
                 }
             }
@@ -392,7 +388,6 @@
             window.location.href = whatsappUrl;
         }
 
-        // تشغيل البناء الفوري وعرض الأصناف مباشرة
         renderMenu();
     </script>
 </body>
