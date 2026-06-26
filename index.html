@@ -159,9 +159,8 @@
 
     <script>
         const WHATSAPP_NUMBER = "9647748841353"; 
-        const CAPTAIN_PASSWORD = "1234"; // رمز دخول الكابتن (يمكنك تعديله لأي رقم)
+        const CAPTAIN_PASSWORD = "1234"; 
 
-        // المصفوفة الافتراضية الأصلية الـ 30 صنفاً بالكامل
         const defaultMenuData = {
             hareesa: [
                 { id: 1, name: "صحن هريسة بالدهن الحر واللحم", price: 5000 },
@@ -203,8 +202,25 @@
             ]
         };
 
-        // جلب البيانات من الذاكرة المحلية إذا كانت معدلة سابقاً، أو استخدام الافتراضية
-        let menuData = JSON.parse(localStorage.getItem('hlem_bismayah_menu')) || defaultMenuData;
+        // فحص وإصلاح ذكي لحالة الذاكرة التلقائية لمنع الاختفاء والتعليق
+        let menuData;
+        try {
+            let localData = localStorage.getItem('hlem_bismayah_menu');
+            if (localData && localData.trim() !== "" && localData !== "undefined") {
+                menuData = JSON.parse(localData);
+                // فحص إذا كانت الأقسام الأساسية مفقودة في الذاكرة لتجنب التعليق
+                if (!menuData.hareesa || !menuData.drinks || !menuData.sweets || !menuData.appetizers) {
+                    menuData = defaultMenuData;
+                    localStorage.setItem('hlem_bismayah_menu', JSON.stringify(defaultMenuData));
+                }
+            } else {
+                menuData = defaultMenuData;
+                localStorage.setItem('hlem_bismayah_menu', JSON.stringify(defaultMenuData));
+            }
+        } catch(e) {
+            menuData = defaultMenuData;
+        }
+
         let cart = {};
         let allItemsFlattened = {};
         let isCaptainMode = false;
@@ -213,6 +229,7 @@
             allItemsFlattened = {}; 
             for (let category in menuData) {
                 const container = document.getElementById(`${category}-items`);
+                if (!container) continue;
                 container.innerHTML = "";
                 
                 if (menuData[category] && menuData[category].length > 0) {
@@ -251,8 +268,13 @@
             document.querySelectorAll('.menu-section').forEach(sec => sec.classList.remove('active-section'));
             document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
             
-            document.getElementById(sectionId).classList.add('active-section');
-            element.classList.add('active');
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.classList.add('active-section');
+            }
+            if (element) {
+                element.classList.add('active');
+            }
             window.scrollTo({ top: 0, behavior: 'instant' });
         }
 
@@ -260,7 +282,8 @@
             if (!cart[id]) cart[id] = 0;
             cart[id] += change;
             if (cart[id] <= 0) delete cart[id];
-            document.getElementById(`qty-${id}`).innerText = cart[id] || 0;
+            const qtyLabel = document.getElementById(`qty-${id}`);
+            if (qtyLabel) qtyLabel.innerText = cart[id] || 0;
             updateCartTotal();
         }
 
@@ -273,16 +296,15 @@
             document.getElementById('modal-total').innerText = total.toLocaleString();
         }
 
-        /* وظائف لوحة تحكم الكابتن */
         function openCaptainPanel() {
             if (!isCaptainMode) {
                 let checkPass = prompt("يرجى إدخال رمز دخول الكابتن الافتراضي:");
                 if (checkPass === CAPTAIN_PASSWORD) {
                     isCaptainMode = true;
-                    alert("تم تفعيل وضع الكابتن بنجاح! ستظهر لك الآن خيارات الإضافة، التعديل، والحذف أسفل كل منتج.");
+                    alert("تم تفعيل وضع الكابتن بنجاح! تظهر لك الآن أزرار التعديل والحذف أسفل المنتجات.");
                     renderMenu();
                 } else {
-                    alert("الرمز خاطئ! لا يمكنك التحكم بالمنيو.");
+                    alert("الرمز خاطئ!");
                     return;
                 }
             }
@@ -317,29 +339,27 @@
             const name = document.getElementById('item-name').value;
             const price = parseInt(document.getElementById('item-price').value);
 
-            if(!name || !price) { alert("الرجاء تعبئة اسم المنتج والسعر بالشكل الصحيح!"); return; }
+            if(!name || !price) { alert("الرجاء تعبئة الاسم والسعر بشكل صحيح!"); return; }
 
             if(id) {
-                // وضع التعديل لحماية الصنف عند النقل بين الأقسام
                 for (let cat in menuData) {
                     menuData[cat] = menuData[cat].filter(p => p.id != id);
                 }
                 menuData[category].push({ id: parseInt(id), name, price });
             } else {
-                // إضافة صنف جديد
                 const newId = Date.now();
                 menuData[category].push({ id: newId, name, price });
             }
 
             localStorage.setItem('hlem_bismayah_menu', JSON.stringify(menuData));
-            alert("تم التحديث والحفظ التلقائي بنجاح في المنيو!");
+            alert("تم الحفظ بنجاح!");
             closeCaptainPanel();
             renderMenu();
             updateCartTotal();
         }
 
         function deleteItem(category, id) {
-            if(confirm("هل أنت متأكد من رغبتك بمسح هذا المنتج نهائياً من قائمة الطعام؟")) {
+            if(confirm("هل تريد مسح هذا المنتج نهائياً؟")) {
                 menuData[category] = menuData[category].filter(p => p.id !== id);
                 if(cart[id]) delete cart[id];
                 localStorage.setItem('hlem_bismayah_menu', JSON.stringify(menuData));
@@ -358,18 +378,4 @@
         function closeCheckoutModal() { document.getElementById('checkout-modal').style.display = 'none'; }
 
         function sendOrderToWhatsApp() {
-            const tableNum = document.getElementById('table-number').value;
-            if (!tableNum) { alert("يجب كتابة رقم الطاولة!"); return; }
-            
-            let itemsDetails = [];
-            let total = 0;
-            for (let id in cart) {
-                if(allItemsFlattened[id]) {
-                    itemsDetails.push(`• ${allItemsFlattened[id].name} (عدد ${cart[id]})`);
-                    total += cart[id] * allItemsFlattened[id].price;
-                }
-            }
-
-            let textMessage = `🔔 *طلب جديد من مطعم حليم بسمايا* 🔔\n\n`;
-            textMessage += `📍 *طاولة رقم:* ${tableNum}\n`;
-            textMessage += `📝 *الطلبات:*\n${itemsDetails.join(
+            const tableNum = document.getElementById('table-number')
