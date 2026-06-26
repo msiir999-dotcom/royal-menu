@@ -110,7 +110,6 @@
 
         </div>
 
-        <!-- زر تحكم الكابتن الخفي سفلياً -->
         <div class="admin-trigger">
             <span class="admin-link" onclick="openCaptainPanel()">⚙️ لوحة تحكم الكابتن (إضافة وتعديل الأسعار والمنتجات)</span>
         </div>
@@ -124,7 +123,6 @@
         </div>
     </div>
 
-    <!-- نافذة تأكيد الطلب للزبون -->
     <div id="checkout-modal" class="modal">
         <div class="modal-content">
             <h3>تأكيد الطلب 🧾</h3>
@@ -135,7 +133,6 @@
         </div>
     </div>
 
-    <!-- نافذة لوحة تحكم الكابتن (إضافة وتعديل الأقسام والأسعار) -->
     <div id="captain-modal" class="modal">
         <div class="modal-content">
             <h3 style="color: var(--gold-light); margin-bottom: 10px;">إدارة قوائم الطعام ⚙️</h3>
@@ -202,21 +199,13 @@
             ]
         };
 
-        // فحص وإصلاح ذكي لحالة الذاكرة التلقائية لمنع الاختفاء والتعليق
+        // تصفير وتنظيف إجباري وشامل للذاكرة القديمة التالفة لمنع الاختفاء تماماً
         let menuData;
         try {
-            let localData = localStorage.getItem('hlem_bismayah_menu');
-            if (localData && localData.trim() !== "" && localData !== "undefined") {
-                menuData = JSON.parse(localData);
-                // فحص إذا كانت الأقسام الأساسية مفقودة في الذاكرة لتجنب التعليق
-                if (!menuData.hareesa || !menuData.drinks || !menuData.sweets || !menuData.appetizers) {
-                    menuData = defaultMenuData;
-                    localStorage.setItem('hlem_bismayah_menu', JSON.stringify(defaultMenuData));
-                }
-            } else {
-                menuData = defaultMenuData;
-                localStorage.setItem('hlem_bismayah_menu', JSON.stringify(defaultMenuData));
-            }
+            // نقوم بمسح الذاكرة القديمة نهائياً وبنائها من جديد لضمان الاستقرار الفوري
+            localStorage.removeItem('hlem_bismayah_menu');
+            menuData = defaultMenuData;
+            localStorage.setItem('hlem_bismayah_menu', JSON.stringify(defaultMenuData));
         } catch(e) {
             menuData = defaultMenuData;
         }
@@ -378,4 +367,33 @@
         function closeCheckoutModal() { document.getElementById('checkout-modal').style.display = 'none'; }
 
         function sendOrderToWhatsApp() {
-            const tableNum = document.getElementById('table-number')
+            const tableNum = document.getElementById('table-number').value;
+            if (!tableNum) { alert("يجب كتابة رقم الطاولة!"); return; }
+            
+            let itemsDetails = [];
+            let total = 0;
+            for (let id in cart) {
+                if(allItemsFlattened[id]) {
+                    itemsDetails.push(`• ${allItemsFlattened[id].name} (عدد ${cart[id]})`);
+                    total += cart[id] * allItemsFlattened[id].price;
+                }
+            }
+
+            let textMessage = `🔔 *طلب جديد من مطعم حليم بسمايا* 🔔\n\n`;
+            textMessage += `📍 *طاولة رقم:* ${tableNum}\n`;
+            textMessage += `📝 *الطلبات:*\n${itemsDetails.join('\n')}\n\n`;
+            textMessage += `💰 *الحساب الكلي:* ${total.toLocaleString()} د.ع\n`;
+            textMessage += `⏰ *الوقت:* ${new Date().toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}`;
+
+            const encodedMessage = encodeURIComponent(textMessage);
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
+            
+            closeCheckoutModal();
+            window.location.href = whatsappUrl;
+        }
+
+        // تشغيل البناء الفوري وعرض الأصناف مباشرة
+        renderMenu();
+    </script>
+</body>
+</html>
