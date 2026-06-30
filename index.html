@@ -2,393 +2,70 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منيو مطعم حليم بسمايا</title>
+    <title>Captain Cafe - المنيو</title>
     <style>
+        /* استخدام الألوان المطلوبة */
         :root {
-            --bg-dark: #070707;
-            --card-bg: #121212;
-            --gold: #c5a059;
-            --gold-light: #e5c185;
-            --text-light: #ffffff;
-            --text-muted: #b3b3b3;
-            --success: #28a745;
-            --danger: #dc3545;
-            --info: #17a2b8;
+            --dark-blue: #132A49;
+            --light-blue: #D6E5F3;
+            --creamy-beige: #F0E8D1;
+            --gray: #7F7B82;
+            --white: #FFFFFF;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-light); padding-bottom: 130px; }
-        
-        .restaurant-header { text-align: center; padding: 25px 20px; background: #000; border-bottom: 2px solid var(--gold); }
-        .restaurant-name { font-size: 26px; font-weight: bold; color: var(--text-light); }
-        .restaurant-info { font-size: 13px; color: var(--text-muted); margin-top: 5px; }
-
-        .categories-nav { display: flex; gap: 10px; overflow-x: auto; padding: 15px 20px; position: sticky; top: 0; background: #070707; z-index: 100; border-bottom: 1px solid #222; scrollbar-width: none; }
-        .categories-nav::-webkit-scrollbar { display: none; }
-        .category-btn { background: var(--card-bg); color: var(--text-light); border: 1px solid #333; padding: 10px 20px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-size: 14px; font-weight: bold; -webkit-tap-highlight-color: transparent; }
-        .category-btn.active { background: var(--gold); color: var(--bg-dark); }
-
-        .menu-container { padding: 20px; max-width: 600px; margin: 0 auto; }
-        
-        .menu-section { display: none; }
-        .menu-section.active-section { display: block; animation: fadeIn 0.3s ease-in-out; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--creamy-beige); 
+            color: var(--dark-blue);
+            margin: 0; 
+            padding: 20px; 
+            text-align: center;
         }
 
-        .section-title { font-size: 18px; color: var(--gold-light); margin-bottom: 15px; border-right: 3px solid var(--gold); padding-right: 8px; }
-        .menu-item { background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid #1a1a1a; display: flex; flex-direction: column; gap: 10px; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .item-title { font-size: 16px; font-weight: bold; }
-        .item-price { color: var(--gold); font-weight: bold; font-size: 14px; margin-top: 4px; }
+        .logo { width: 150px; margin-bottom: 10px; }
         
-        .quantity-control { display: flex; align-items: center; gap: 12px; background: #000; padding: 4px 10px; border-radius: 20px; border: 1px solid #333; }
-        .q-btn { background: none; border: none; color: var(--gold); font-size: 18px; font-weight: bold; cursor: pointer; width: 24px; }
-        .q-num { font-size: 14px; font-weight: bold; min-width: 15px; text-align: center; }
+        .tagline { 
+            font-size: 1.2em; 
+            color: var(--dark-blue); 
+            margin-bottom: 30px; 
+            font-style: italic;
+        }
 
-        .captain-actions { display: flex; gap: 8px; border-top: 1px solid #222; padding-top: 8px; width: 100%; }
-        .btn-captain-edit { background: var(--info); color: white; border: none; padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .btn-captain-del { background: var(--danger); color: white; border: none; padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .menu-section { 
+            background: var(--white); 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin: 15px auto; 
+            max-width: 600px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
 
-        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #121212; border-top: 2px solid var(--gold); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; max-width: 600px; margin: 0 auto; z-index: 99; }
-        .btn-order { background: var(--success); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
-        .modal-content { background: var(--card-bg); border: 1px solid var(--gold); border-radius: 15px; padding: 25px; width: 100%; max-width: 400px; text-align: center; max-height: 90vh; overflow-y: auto; }
-        .input-table, .captain-input, .captain-select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; text-align: center; font-size: 16px; margin: 10px 0; font-weight: bold; outline: none; }
-        .captain-select { text-align: right; direction: rtl; }
-        .btn-confirm { background: var(--gold); color: #000; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; }
-        .close-modal { color: var(--text-muted); font-size: 13px; cursor: pointer; margin-top: 15px; display: inline-block; }
-
-        .admin-trigger { text-align: center; margin: 20px 0; }
-        .admin-link { color: var(--gold-light); font-size: 13px; text-decoration: underline; cursor: pointer; }
+        h2 { border-bottom: 2px solid var(--light-blue); padding-bottom: 10px; }
+        
+        .item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 8px 0; 
+            border-bottom: 1px solid #eee; 
+            color: var(--gray);
+        }
     </style>
 </head>
 <body>
 
-    <div id="main-app">
-        <div class="restaurant-header">
-            <div class="restaurant-name">حليم بسمايا</div>
-            <div class="restaurant-info">📍 بغداد - بسمايا | 🕒 منيو المائدة الرقمي ذاتي التحكم</div>
-        </div>
+    <!-- إضافة اللوجو -->
+    <img src="URL_OF_YOUR_LOGO_HERE" alt="Captain Cafe Logo" class="logo">
+    
+    <!-- العبارة المطلوبة -->
+    <h1 class="tagline">رحلة مذاق لا تنسى</h1>
 
-        <div class="categories-nav">
-            <button class="category-btn active" onclick="switchPage('hareesa', this)">🥣 الهريسة</button>
-            <button class="category-btn" onclick="switchPage('drinks', this)">🥤 المشروبات</button>
-            <button class="category-btn" onclick="switchPage('sweets', this)">🍰 الحلويات</button>
-            <button class="category-btn" onclick="switchPage('appetizers', this)">🥗 المقبلات</button>
-        </div>
-
-        <div class="menu-container">
-            <div id="hareesa" class="menu-section active-section">
-                <h2 class="section-title">قسم الهريسة الفاخرة</h2>
-                <div id="hareesa-items"></div>
-            </div>
-            <div id="drinks" class="menu-section">
-                <h2 class="section-title">مشروبات غازية باردة</h2>
-                <div id="drinks-items"></div>
-            </div>
-            <div id="sweets" class="menu-section">
-                <h2 class="section-title">قسم الحلويات والتحلية</h2>
-                <div id="sweets-items"></div>
-            </div>
-            <div id="appetizers" class="menu-section">
-                <h2 class="section-title">قسم المقبلات والشوربات</h2>
-                <div id="appetizers-items"></div>
-            </div>
-        </div>
-
-        <div class="admin-trigger">
-            <span class="admin-link" onclick="openCaptainPanel()">⚙️ لوحة تحكم الكابتن (إضافة وتعديل الأسعار والمنتجات)</span>
-        </div>
-
-        <div class="cart-bar">
-            <div>
-                <span style="font-size: 13px; color: var(--text-muted);">إجمالي الحساب:</span>
-                <div id="cart-total" style="font-size: 18px; font-weight: bold; color: var(--gold);">0 د.ع</div>
-            </div>
-            <button class="btn-order" onclick="openCheckoutModal()">إرسال الطلب عبر الواتساب 🛒</button>
-        </div>
+    <!-- مثال لقسم واحد، يمكنك تكرار الكود لكل الأقسام العشرة -->
+    <div class="menu-section">
+        <h2>القهوة المختصة</h2>
+        <div class="item"><span>V60</span> <span>3.00$</span></div>
+        <div class="item"><span>Chemex</span> <span>3.50$</span></div>
+        <!-- أضف بقية الـ 10 أصناف هنا بنفس الطريقة -->
     </div>
 
-    <!-- نافذة تأكيد الطلب للزبون -->
-    <div id="checkout-modal" class="modal">
-        <div class="modal-content">
-            <h3>تأكيد الطلب 🧾</h3>
-            <p style="margin-top: 10px; color: var(--text-muted);">إجمالي الحساب: <span id="modal-total" style="color: var(--gold); font-weight: bold;">0</span> د.ع</p>
-            <input type="number" id="table-number" class="input-table" placeholder="اكتب رقم طاولتك هنا" required>
-            <button class="btn-confirm" onclick="sendOrderToWhatsApp()">تأكيد وإرسال للمطعم</button>
-            <span class="close-modal" onclick="closeCheckoutModal()">إلغاء</span>
-        </div>
-    </div>
-
-    <!-- نافذة لوحة تحكم الكابتن -->
-    <div id="captain-modal" class="modal">
-        <div class="modal-content">
-            <h3 style="color: var(--gold-light); margin-bottom: 10px;">إدارة قوائم الطعام ⚙️</h3>
-            <input type="hidden" id="edit-item-id">
-            
-            <label style="display:block; text-align:right; font-size:12px; color:var(--text-muted);">اختر القسم:</label>
-            <select id="item-category" class="captain-select">
-                <option value="hareesa">🥣 الهريسة</option>
-                <option value="drinks">🥤 المشروبات</option>
-                <option value="sweets">🍰 الحلويات</option>
-                <option value="appetizers">🥗 المقبلات</option>
-            </select>
-
-            <input type="text" id="item-name" class="captain-input" placeholder="اسم المنتج الجديد أو الحالي">
-            <input type="number" id="item-price" class="captain-input" placeholder="السعر بالدينار العراقي (مثال: 5000)">
-            
-            <button class="btn-confirm" onclick="saveCaptainChanges()">حفظ وتحديث الصنف ✅</button>
-            <span class="close-modal" onclick="closeCaptainPanel()">إغلاق التعديل</span>
-        </div>
-    </div>
-
-    <script>
-        const WHATSAPP_NUMBER = "9647748841353"; 
-        const CAPTAIN_PASSWORD = "1234"; 
-
-        const defaultMenuData = {
-            hareesa: [
-                { id: 1, name: "صحن هريسة بالدهن الحر واللحم", price: 5000 },
-                { id: 2, name: "صحن هريسة ملوكي مضاعف اللحم", price: 5000 },
-                { id: 3, name: "صحن هريسة بالمكسرات والدهن الحر", price: 5000 },
-                { id: 4, name: "سفري هريسة عائلي وسط", price: 5000 },
-                { id: 5, name: "صحن هريسة بالدارسين والقشطة", price: 5000 }
-            ],
-            drinks: [
-                { id: 6, name: "بيبسي بارد علبة", price: 500 },
-                { id: 7, name: "سفن أب بارد علبة", price: 500 },
-                { id: 8, name: "ميرندا برتقال علبة", price: 500 },
-                { id: 9, name: "ميرندا حمضيات علبة", price: 500 },
-                { id: 10, name: "ماء معدني بارد نقي", price: 500 }
-            ],
-            sweets: [
-                { id: 11, name: "ماعون مشكل بقلاوة عراقية", price: 5000 },
-                { id: 12, name: "صحن كنافة نابلسية بالجبن خشنة", price: 5000 },
-                { id: 13, name: "صحن كنافة ناعمة بين نارين", price: 5000 },
-                { id: 14, name: "ماعون زلابية وحلاوة جكليتية", price: 5000 },
-                { id: 15, name: "صحن بورمة بالفستق الحلبي", price: 5000 },
-                { id: 16, name: "كيكة الزعفران بالحليب الفاخرة", price: 5000 },
-                { id: 17, name: "صحن حلاوة دهينة نجفية أصلية", price: 5000 },
-                { id: 18, name: "أم علي بالمكسرات والقشطة حارة", price: 5000 },
-                { id: 19, name: "ماعون عوامات (لقمة القاضي) عسل", price: 5000 },
-                { id: 20, name: "صحن حلاوة شعرية بالهيل والزبادي", price: 5000 }
-            ],
-            appetizers: [
-                { id: 21, name: "صحن مقبلات مشكل كبب وسمبوسك", price: 5000 },
-                { id: 22, name: "ماعون حمص بطحينة بالزيتون", price: 5000 },
-                { id: 23, name: "ماعون متبل باذنجان مشوي بالرمان", price: 2500 },
-                { id: 24, name: "صحن بابا غنوج عراقي أصيل", price: 5000 },
-                { id: 25, name: "جلاي مقبلات روسية فاخرة", price: 5000 },
-                { id: 26, name: "ماعون تبولة لبنانية فريش", price: 5000 },
-                { id: 27, name: "ماعون سلطة سيزر بالدجاج مقرمش", price: 5000 },
-                { id: 28, name: "صحن جاجيك بالخيار والنعناع البارد", price: 5000 },
-                { id: 29, name: "كبة حلب مقرمشة (سيرفس 4 قطع)", price: 5000 },
-                { id: 30, name: "شوربة عدس ساخنة مع خبز محمص", price: 5000 }
-            ]
-        };
-
-        // فحص ذكي وآمن: نقرأ القديم إذا وجد، وإن لم يوجد نعتمد الافتراضي دون تصفير تلقائي ومستمر
-        let menuData;
-        try {
-            let localData = localStorage.getItem('hlem_bismayah_menu');
-            if (localData && localData.trim() !== "" && localData !== "undefined") {
-                menuData = JSON.parse(localData);
-                if (!menuData.hareesa || !menuData.drinks || !menuData.sweets || !menuData.appetizers) {
-                    menuData = defaultMenuData;
-                    localStorage.setItem('hlem_bismayah_menu', JSON.stringify(defaultMenuData));
-                }
-            } else {
-                menuData = defaultMenuData;
-                localStorage.setItem('hlem_bismayah_menu', JSON.stringify(defaultMenuData));
-            }
-        } catch(e) {
-            menuData = defaultMenuData;
-        }
-
-        let cart = {};
-        let allItemsFlattened = {};
-        let isCaptainMode = false;
-
-        function renderMenu() {
-            allItemsFlattened = {}; 
-            for (let category in menuData) {
-                const container = document.getElementById(`${category}-items`);
-                if (!container) continue;
-                container.innerHTML = "";
-                
-                if (menuData[category] && menuData[category].length > 0) {
-                    menuData[category].forEach(item => {
-                        allItemsFlattened[item.id] = item; 
-                        
-                        const div = document.createElement('div');
-                        div.className = "menu-item";
-                        div.innerHTML = `
-                            <div class="item-row">
-                                <div>
-                                    <div class="item-title">${item.name}</div>
-                                    <div class="item-price">${item.price.toLocaleString()} د.ع</div>
-                                </div>
-                                <div class="quantity-control">
-                                    <button class="q-btn" onclick="updateQty(${item.id}, -1)">-</button>
-                                    <span class="q-num" id="qty-${item.id}">${cart[item.id] || 0}</span>
-                                    <button class="q-btn" onclick="updateQty(${item.id}, 1)">+</button>
-                                </div>
-                            </div>
-                            ${isCaptainMode ? `
-                            <div class="captain-actions">
-                                <button class="btn-captain-edit" onclick="setupEditItem('${category}', ${item.id})">تعديل السعر/الاسم ✏️</button>
-                                <button class="btn-captain-del" onclick="deleteItem('${category}', ${item.id})">حذف الصنف 🗑️</button>
-                            </div>` : ''}
-                        `;
-                        container.appendChild(div);
-                    });
-                } else {
-                    container.innerHTML = `<p style="color:var(--text-muted); font-size:13px; text-align:center; padding:10px;">لا توجد أصناف في هذا القسم حالياً.</p>`;
-                }
-            }
-        }
-
-        function switchPage(sectionId, element) {
-            document.querySelectorAll('.menu-section').forEach(sec => sec.classList.remove('active-section'));
-            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-            
-            const selectedSection = document.getElementById(sectionId);
-            if (selectedSection) selectedSection.classList.add('active-section');
-            if (element) element.classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'instant' });
-        }
-
-        function updateQty(id, change) {
-            if (!cart[id]) cart[id] = 0;
-            cart[id] += change;
-            if (cart[id] <= 0) delete cart[id];
-            const qtyLabel = document.getElementById(`qty-${id}`);
-            if (qtyLabel) qtyLabel.innerText = cart[id] || 0;
-            updateCartTotal();
-        }
-
-        function updateCartTotal() {
-            let total = 0;
-            for (let id in cart) {
-                if(allItemsFlattened[id]) total += cart[id] * allItemsFlattened[id].price;
-            }
-            document.getElementById('cart-total').innerText = total.toLocaleString() + " د.ع";
-            document.getElementById('modal-total').innerText = total.toLocaleString();
-        }
-
-        function openCaptainPanel() {
-            if (!isCaptainMode) {
-                let checkPass = prompt("يرجى إدخال رمز دخول الكابتن الافتراضي:");
-                if (checkPass === CAPTAIN_PASSWORD) {
-                    isCaptainMode = true;
-                    alert("تم تفعيل وضع الكابتن بنجاح!");
-                    renderMenu();
-                } else {
-                    alert("الرمز خاطئ!");
-                    return;
-                }
-            }
-            document.getElementById('captain-modal').style.display = 'flex';
-        }
-
-        function closeCaptainPanel() {
-            document.getElementById('captain-modal').style.display = 'none';
-            resetCaptainForm();
-        }
-
-        function resetCaptainForm() {
-            document.getElementById('edit-item-id').value = "";
-            document.getElementById('item-name').value = "";
-            document.getElementById('item-price').value = "";
-        }
-
-        function setupEditItem(category, id) {
-            let item = menuData[category].find(p => p.id === id);
-            if(item) {
-                document.getElementById('edit-item-id').value = item.id;
-                document.getElementById('item-category').value = category;
-                document.getElementById('item-name').value = item.name;
-                document.getElementById('item-price').value = item.price;
-                document.getElementById('captain-modal').style.display = 'flex';
-            }
-        }
-
-        function saveCaptainChanges() {
-            const id = document.getElementById('edit-item-id').value;
-            const category = document.getElementById('item-category').value;
-            const name = document.getElementById('item-name').value;
-            const price = parseInt(document.getElementById('item-price').value);
-
-            if(!name || !price) { alert("الرجاء تعبئة الاسم والسعر بشكل صحيح!"); return; }
-
-            if(id) {
-                for (let cat in menuData) {
-                    menuData[cat] = menuData[cat].filter(p => p.id != id);
-                }
-                menuData[category].push({ id: parseInt(id), name, price });
-            } else {
-                const newId = Date.now();
-                menuData[category].push({ id: newId, name, price });
-            }
-
-            localStorage.setItem('hlem_bismayah_menu', JSON.stringify(menuData));
-            alert("تم الحفظ بنجاح!");
-            closeCaptainPanel();
-            renderMenu();
-            updateCartTotal();
-        }
-
-        function deleteItem(category, id) {
-            if(confirm("هل تريد مسح هذا المنتج نهائياً؟")) {
-                menuData[category] = menuData[category].filter(p => p.id !== id);
-                if(cart[id]) delete cart[id];
-                localStorage.setItem('hlem_bismayah_menu', JSON.stringify(menuData));
-                renderMenu();
-                updateCartTotal();
-            }
-        }
-
-        function openCheckoutModal() {
-            let total = 0;
-            for (let id in cart) total += cart[id];
-            if (total === 0) { alert("الرجاء إضافة أصناف أولاً!"); return; }
-            document.getElementById('checkout-modal').style.display = 'flex';
-        }
-
-        function closeCheckoutModal() { document.getElementById('checkout-modal').style.display = 'none'; }
-
-        function sendOrderToWhatsApp() {
-            const tableNum = document.getElementById('table-number').value;
-            if (!tableNum) { alert("يجب كتابة رقم الطاولة!"); return; }
-            
-            let itemsDetails = [];
-            let total = 0;
-            for (let id in cart) {
-                if(allItemsFlattened[id]) {
-              itemsDetails.push(`• ${allItemsFlattened[id].name} (عدد ${cart[id]})`);
-                    total += cart[id] * allItemsFlattened[id].price;
-                }
-            }
-
-            let textMessage = `🔔 *طلب جديد من مطعم حليم بسمايا* 🔔\n\n`;
-            textMessage += `📍 *طاولة رقم:* ${tableNum}\n`;
-            textMessage += `📝 *الطلبات:*\n${itemsDetails.join('\n')}\n\n`;
-            textMessage += `💰 *الحساب الكلي:* ${total.toLocaleString()} د.ع\n`;
-            textMessage += `⏰ *الوقت:* ${new Date().toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}`;
-
-            const encodedMessage = encodeURIComponent(textMessage);
-            const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
-            
-            closeCheckoutModal();
-            window.location.href = whatsappUrl;
-        }
-
-        renderMenu();
-    </script>
 </body>
 </html>
